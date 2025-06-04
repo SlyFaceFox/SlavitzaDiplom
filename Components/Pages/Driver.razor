@@ -1,0 +1,82 @@
+﻿@page "/driver"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Web
+@using System.Web
+@using System.Text.RegularExpressions
+@using SlavitzaDiplom.Components.Models
+<PageTitle>Driver</PageTitle>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th style="width: 50%">Список заказов</th>
+            <th>Информация о заказе</th>
+          
+        </tr>
+    </thead>
+
+
+    <tbody>
+        <tr>
+            <td>
+               @* левая часть *@
+               <MudTable Items="@arrayOrder.Where(o => o.Aprruved)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <HeaderContent>
+                         <MudTh >Номер</MudTh>
+                         <MudTh>Дата</MudTh> 
+                         <MudTh> </MudTh>
+                    </HeaderContent>
+                     <RowTemplate>
+                                <MudTd>@context.ID </MudTd>
+                                <MudTd>@context.Date </MudTd>
+                                <MudTd><MudButton @onclick = "@(e => GetOrder(context.ID) )">Информация</MudButton></MudTd>
+                     </RowTemplate>
+                </MudTable>
+               
+            </td>
+            <td>
+                @* правая часть  *@
+               
+                <MudCard>
+                        <MudCardContent>
+                            <MudText> 
+                                    @foreach(string s in OrderDescription.Split('\n'))
+                                    {
+                                        @s <br/>
+                                    }
+                            </MudText>
+                        
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="()=> ClickComplete()">Закрыть заказ</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </td>
+             
+        </tr>
+        
+    </tbody>
+</table>
+
+
+
+@code  {
+    private bool _hidePosition;
+    private bool _loading;
+
+    public static List<Order> arrayOrder => MyDataBase.BaseOrder;
+    public string OrderDescription = "";
+    public Action ClickComplete = () => { };
+    public void GetOrder(int ID)
+    {
+
+        
+        Order o = MyDataBase.BaseOrder.Where(o => o.ID == ID).ToArray()[0];
+        OrderDescription = $"\n Номер заказ: {o.ID} \n Адрес заказа:{o.Address} \n Заказ закрыт: {o.Completed}";
+        ClickComplete = () => { o.Completed = true; OrderDescription = $"\n Номер заказ: {o.ID} \n Адрес заказа:{o.Address} \n Заказ закрыт: {o.Completed}"; };
+    }
+
+
+}
+
+         

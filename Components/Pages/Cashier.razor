@@ -1,0 +1,116 @@
+﻿@page "/cashier"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Web
+@using System.Web
+@using System.Text.RegularExpressions
+@using SlavitzaDiplom.Components.Models
+@using MudBlazor
+<PageTitle>Cashier</PageTitle>
+<h3>Cashier</h3>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th style="width: 50%">Список продукции</th>
+            <th>Информация о заказе</th>
+          
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td>
+               @* левая часть *@
+               <MudTable Items="@MyDataBase.BaseProduct" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <HeaderContent>
+                         <MudTh >Артикул</MudTh>
+                         <MudTh>Название</MudTh> 
+                         <MudTh>Количество</MudTh> 
+                         <MudTh>Цена за единицу</MudTh> 
+                         <MudTh>Добавить в заказ</MudTh>
+                    </HeaderContent>
+                     <RowTemplate>
+                                <MudTd>@context.ID </MudTd>
+                                <MudTd>@context.Name </MudTd>
+                                <MudTd>@context.CountFree </MudTd>
+                                <MudTd>@context.Price </MudTd>
+                        <MudTd><MudButton @onclick="@(e => addToOrder(context.ID))">Добавить продукт</MudButton></MudTd>
+                     </RowTemplate>
+                </MudTable>
+               
+            </td>
+            <td>
+                
+                <MudNumericField @bind-Value="OrderID" Label="ID" Variant="Variant.Filled" Min="0" />
+                <MudButton @onclick="@(e => ChangeOrder())">Сформировать заказ</MudButton>
+                @* правая часть  *@
+                <MudTable Items="@MyDataBase.BaseOrder.Where(o => o.ID == OrderID).First().Products" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <HeaderContent>
+                        <MudTh>Артикул</MudTh>
+                        <MudTh>Название</MudTh>
+                        <MudTh>Количество</MudTh>
+                        <MudTh>Цена за единицу</MudTh>
+                        <MudTh> </MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.ID </MudTd>
+                        <MudTd>@context.Name </MudTd>
+                        <MudTd>@context.CountFree </MudTd>
+                        <MudTd>@context.Price </MudTd>
+                        <MudTd><MudNumericField @bind-Value="context.CountReserved" Label="" Variant="Variant.Filled" Min="0" /></MudTd>
+                    </RowTemplate>
+                </MudTable>
+
+
+
+                
+            </td>
+             
+        </tr>
+        
+    </tbody>
+</table>
+
+
+
+@code 
+{
+    public int OrderID = 1;
+
+    private bool _hidePosition;
+    private bool _loading;
+
+    public void addToOrder(int ID)
+    {
+        var qo = MyDataBase.BaseOrder.Where(o => o.ID == OrderID);
+        if(qo.Count() > 0)
+        {
+            Order o = qo.First();
+            Product p = MyDataBase.BaseProduct.Where(p => p.ID == ID).First();
+            if(!o.Products.Contains(p))
+                o.Products.Add(p);
+        }
+    }
+    public void ChangeOrder()
+    {
+        Order o = MyDataBase.BaseOrder.Where(o => o.ID == OrderID).First();
+        List<Product> temp = new();
+        foreach(var p in o.Products)
+        {
+            Product x = new() { ID = p.ID, Name = p.Name, Price = p.Price};
+            x.Count = p.CountReserved;
+            p.Count = p.CountFree;
+            p.CountReserved = 0;
+            temp.Add(x);
+        }
+        o.Products.Clear();
+        o.Products.AddRange(temp);
+
+    }
+  
+
+
+
+
+}

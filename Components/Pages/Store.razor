@@ -1,0 +1,97 @@
+﻿@page "/store"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Web
+@using System.Web
+@using System.Text.RegularExpressions
+@using SlavitzaDiplom.Components.Models
+@using MudBlazor
+<PageTitle>Store</PageTitle>
+<h3>Store</h3>
+<input placeholder="ID" @bind-value="@ProductID" />
+<input placeholder="Название" @bind-value="@Name" />
+<input placeholder="Количество" @bind-value="@Count" />
+<input placeholder="Цена" @bind-value="@Price" />
+<input placeholder="Описание" @bind-value="@Description" />
+<MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" @onclick="@(e => AddProduct())">Добавить продукт</MudButton>
+
+<table class="table">
+    
+    <thead>
+        <tr>
+            <th>Артикул</th>
+            <th>Название</th>
+            <th>Количесвтво</th>
+            <th>Цена за единицу</th>
+          
+        </tr>
+    </thead>
+
+
+    <tbody>
+        @foreach(var p in MyDataBase.BaseProduct)
+        {
+            <tr>
+                <td>@p.ID</td>
+                <td>@p.Name</td>
+                <td>@p.Count</td>
+                <td>@p.Price</td>
+            </tr>
+        }
+
+    </tbody>
+    
+</table>
+
+
+
+
+@code
+{
+    public string ProductID;
+    public string Name;
+    public string Count;
+    public string Price;
+    public string Description;
+
+    public void AddProduct()
+    {
+        if (ProductID == "")
+            return;
+        var q = MyDataBase.BaseProduct.Where(p => p.ID == int.Parse(ProductID));
+        if (q.Count() > 0)
+        {
+            q.First().Name = Name;
+            q.First().Count = int.Parse(Count);
+            q.First().Price = decimal.Parse(Price);
+            q.First().Description = Description;
+        }
+        else
+        {
+           
+            Product product = new Product()
+            {
+                ID = int.Parse(ProductID),
+                Name = Name,
+                Count = int.Parse(Count),
+                Price = decimal.Parse(Price),
+                Description = Description
+
+            };
+            MyDataBase.BaseProduct.Add(product);
+            ProductID = "";
+            Name = "";
+            Count = "";
+            Description = "";
+            Price = "";
+
+        }
+
+       
+    }
+
+
+
+
+
+
+}

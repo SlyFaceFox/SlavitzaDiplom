@@ -1,0 +1,87 @@
+﻿@page "/operator"
+@rendermode InteractiveServer
+@using SlavitzaDiplom.Components.Models
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th style="width: 50%">Список заказов</th>
+            <th>Информация о заказе</th>
+          
+        </tr>
+    </thead>
+
+
+    <tbody>
+        <tr>
+            <td>
+               @* левая часть *@
+               <MudTable Items="@arrayOrder" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <HeaderContent>
+                         <MudTh >Номер</MudTh>
+                         <MudTh>Дата</MudTh> 
+                         <MudTh> </MudTh>
+                    </HeaderContent>
+                     <RowTemplate>
+                                <MudTd>@context.ID </MudTd>
+                                <MudTd>@context.Date </MudTd>
+                                <MudTd><MudButton @onclick = "@(e => GetOrder(context) )">Информация</MudButton></MudTd>
+                     </RowTemplate>
+                </MudTable>
+               
+            </td>
+            <td>
+                @* правая часть  *@
+
+                <MudTable Items="@activeOrder.Products" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+                    <HeaderContent>
+                        <MudTh>Артикул</MudTh>
+                        <MudTh>Название</MudTh>
+                        <MudTh>Количество</MudTh>
+                        <MudTh>Цена за единицу</MudTh>
+                       
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.ID </MudTd>
+                        <MudTd>@context.Name </MudTd>
+                        <MudTd>@context.CountFree </MudTd>
+                        <MudTd>@context.Price </MudTd>
+                    </RowTemplate>
+
+                </MudTable>
+                <MudTd><MudButton @onclick="@(e => Approved())">Подтвердить</MudButton></MudTd>
+            </td>
+             
+        </tr>
+        
+    </tbody>
+</table>
+<h3>Operator</h3>
+
+
+
+
+
+@code
+{
+    private bool _hidePosition;
+    private bool _loading;
+    public static List<Order> arrayOrder => MyDataBase.BaseOrder;
+    public Order activeOrder =  MyDataBase.BaseOrder.First();
+
+    public string OrderDescription = "";
+    public Action ClickComplete = () => { };
+    public void GetOrder(Order o)
+    {
+
+
+        activeOrder = o;
+
+    }
+    public void Approved()
+    {
+        activeOrder.Aprruved = true;
+    }
+
+}
