@@ -1,0 +1,57 @@
+﻿@page "/Authorization"
+@rendermode InteractiveServer
+@using SlavitzaDiplom.Components.Models
+
+@inject NavigationManager Navigation
+
+<MudPaper Class="mx-auto mt-12 p-8" MaxWidth="450px" Elevation="4" Style="min-height: 350px; padding-left: 24px; padding-right: 24px;">
+    <MudText Typo="Typo.h5" Class="mb-6" Align="Align.Center">Вход в систему</MudText>
+
+    <MudTextField @bind-Value="_login" Label="Логин" Required="true" Class="mb-5" />
+    <MudTextField @bind-Value="_password" Label="Пароль" InputType="InputType.Password" Required="true" Class="mb-7" />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" OnClick="OnLoginClicked" Disabled="@_isLoading">
+        Войти
+    </MudButton>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <MudText Color="Color.Error" Class="mt-4" Align="Align.Center">@_errorMessage</MudText>
+    }
+</MudPaper>
+
+@code {
+    private string _login = string.Empty;
+    private string _password = string.Empty;
+    private bool _isLoading = false;
+    private string _errorMessage;
+
+    private void OnLoginClicked()
+    {
+        _errorMessage = null;
+        _isLoading = true;
+
+        if (_login == "store" && _password == "store123")
+        {
+            Navigation.NavigateTo("/store");
+        }
+        else if (_login == "operator" && _password == "operator123")
+        {
+            Navigation.NavigateTo("/operator");
+        }
+        else if (_login == "cashier" && _password == "cashier123")
+        {
+            Navigation.NavigateTo("/cashier");
+        }
+        else if (_login == "driver" && _password == "driver123")
+        {
+            Navigation.NavigateTo("/driver");
+        }
+        else
+        {
+            _errorMessage = "Неверный логин или пароль";
+        }
+
+        _isLoading = false;
+    }
+}
